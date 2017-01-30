@@ -9,20 +9,8 @@
             var myModule = angular.module('AngularJSExample3', ['ngAnimate']);
             
             //first register the controller - https://docs.angularjs.org/guide/migration
-            myModule.controller('MainController', ['$scope', 'Auth', '$location', function ($scope, Auth, $location){
-                
-                $scope.$watch(Auth.isLoggedin, function(value, oldvalue) {
-                    
-                    if(!value && oldvalue) {
-                        console.log("Disconnect");
-                        $location.path('/login');
-                    }
-                    
-                    if(value){
-                        console.log("Connect");
-                    }
-                }, true);
-                
+            myModule.controller('MainController', 
+                function ($scope) {
                     var mc = this;
                     
                     mc.user = null;
@@ -32,44 +20,31 @@
                     });
                     $scope.$on('logout', function(event, name){
                         mc.user = null;                  
-                    });
+                    });                    
                 }
-             ]);
-
-            myModule.factory('Auth', function(){
-                var user;
-                        
-                        return{
-                            setUser : function(aUser){
-                                user = aUser;
-                            },
-                            isLoggedin : function(){
-                                return (user)? user : false;
-                            }
-                        };
-            });
+            );
             
+            myModule.controller('LoginController', 
+                function ($scope) {
+                    var lc = this;
+                    lc.name = '';
+                    
+                    var loginInfo = ["tsellmyer", "rsellmyer", "vnelson"];
+                    
+                    lc.login = function login(){
                         
-            myModule.controller('LoginController', [
-                "scope", 'Auth', function ($scope, Auth) {
-                    $scope.login = function() {
+                        if (loginInfo.indexOf(lc.name) > -1){
+                        $scope.$emit('login', lc.name);
+                    }
+
                     };
-                }]);
-            
-            myModule.run(['$rootScope', '$location', 'Auth', function ($rootScope, $location, Auth) {
-                $rootScope.$on('$routeChangeStart', function (event) {
-
-                    if (!Auth.isLoggedIn()) {
-                    console.log('DENY');
-                    event.preventDefault();
-                    $location.path('/login');
+                    
+                    lc.logout = function logout(){
+                        $scope.$emit('logout');
+                    };                  
+                    
                 }
-                     else {
-                        console.log('ALLOW');
-                        $location.path('/home');
-                }
-        });
-}]);
+            );            
             
         </script>
         <style>
